@@ -24,30 +24,28 @@ The game loaded without errors and looked normal at first: a title, a difficulty
 
 ## 2. How did you use AI as a teammate?
 
-- Which AI tools did you use on this project (for example: ChatGPT, Gemini, Copilot)?
-- Give one example of an AI suggestion that was correct (including what the AI suggested and how you verified the result).
-- Give one example of an AI suggestion you did not accept as written (including what the AI suggested, why you rejected or changed it, and how you verified your version). It does not have to be a suggestion that was wrong: over-engineered, out of scope, harder to read, or a poor fit for this codebase all count.
+I used GitHub Copilot Chat in Agent mode inside VS Code to make the code changes, and Claude as a guide to plan the steps, explain bugs, and review Copilot's diffs with me. I started a new Copilot chat for each bug so it stayed focused.
+
+**Correct suggestion:** For the string-secret bug, I asked Copilot to always pass the integer secret to `check_guess` and remove the `except TypeError` fallback. It replaced the 5-line `% 2` block with one line, deleted the fallback, and added a test that `check_guess(100, 46)` returns "Too High". I checked the diff line by line, ran `python -m pytest` (6 passed), and then guessed 100 twice in the live game. Both times it said "Go LOWER!", where before the fix the same guess gave two different hints.
+
+**Suggestion I did not accept as written:** When I asked Copilot to move the functions into `logic_utils.py` and fix the backwards hints, its first attempt only changed the hint text and didn't move the functions at all (the diff was just +5 -3). I had to follow up and ask again. After the move, it swapped the words but left the emojis, so "Too High" showed "📈 Go LOWER!" with an up-arrow chart. I fixed the emojis by hand so 📉 goes with LOWER and 📈 goes with HIGHER, then confirmed in the pytest output and the game that the messages matched.
 
 ---
 
 ## 3. Debugging and testing your fixes
 
-- How did you decide whether a bug was really fixed?
-- Describe at least one test you ran (manual or using pytest)  
-  and what it showed you about your code.
-- Did AI help you design or understand any tests? How?
+I counted a bug as fixed only when two things were true: the pytest tests passed, and I could see the correct behavior in the running game using the same input from my bug log. Running `pytest` directly failed with `ModuleNotFoundError: No module named 'logic_utils'`, so I used `python -m pytest` instead, which runs from the project folder. After moving the functions, the 3 starter tests still failed because `check_guess` returns a tuple like `('Win', '🎉 Correct!')` but the tests compared it to just `'Win'`. I decided to update the tests to unpack `(outcome, message)` instead of changing `check_guess`, because `app.py` needs the message to show the hint. Copilot then wrote the updated tests plus new ones checking that a too-high guess says "LOWER", a too-low guess says "HIGHER", and that `check_guess(100, 46)` is "Too High". Final result: 6 passed.
 
 ---
 
 ## 4. What did you learn about Streamlit and state?
 
-- How would you explain Streamlit "reruns" and session state to a friend who has never used Streamlit?
+Streamlit reruns the whole script from top to bottom every time you click a button or type something, so normal variables get reset on every click. `st.session_state` is like a small notebook that survives those reruns, which is why the secret, attempts, score, and status are stored there. This also explained the New Game bug: the button reset some values in the notebook but left `status` as "won", so on the next rerun the script saw "won" and stopped. It also explains why "Attempts left" lags one step behind, because that box is drawn near the top of the script before the Submit code further down updates the count.
 
 ---
 
 ## 5. Looking ahead: your developer habits
 
-- What is one habit or strategy from this project that you want to reuse in future labs or projects?
-  - This could be a testing habit, a prompting strategy, or a way you used Git.
-- What is one thing you would do differently next time you work with AI on a coding task?
-- In one or two sentences, describe how this project changed the way you think about AI generated code.
+- **Habit to keep:** One bug per AI chat, with a `# FIXME` marking the spot first, and reviewing the diff before keeping anything. Smaller, focused prompts gave me changes I could actually check.
+- **What I'd do differently:** Use two terminals from the start (one for the Streamlit app and one for git and pytest). I kept pasting git commands into the terminal that was still running the game, so they never ran.
+- **How this changed my thinking:** AI-generated code can look finished and still be wrong in small ways, like an emoji that contradicts the text or a fallback that hides the real bug. I now treat AI output as a draft that I have to verify with tests and by actually running the program.
