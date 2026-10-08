@@ -20,6 +20,7 @@ The game loaded without errors and looked normal at first: a title, a difficulty
 | Won the game (guessed 46), then clicked New Game | A fresh game I can play | New secret (72) and Attempts reset to 0, but the page still said "You already won. Start a new game to play again." and wouldn't take guesses. Score (30) and History were not reset | None |
 | Refreshed, switched difficulty to Easy | Prompt says "between 1 and 20", secret is in 1–20 | Sidebar said "Range: 1 to 20", but the prompt still said "between 1 and 100" and the secret was 36 | None |
 
+---
 
 ## 2. How did you use AI as a teammate?
 
