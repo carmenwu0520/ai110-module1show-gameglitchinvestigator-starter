@@ -4,21 +4,22 @@ Answer each question in 3 to 5 sentences. Be specific and honest about what actu
 
 ## 1. What was broken when you started?
 
-- What did the game look like the first time you ran it?
-- List at least two concrete bugs you noticed at the start  
-  (for example: "the hints were backwards").
+The game loaded without errors and looked normal at first: a title, a difficulty dropdown, a guess box, Submit / New Game buttons, and a "Developer Debug Info" panel that shows the secret. But the numbers were off right away. The sidebar said "Attempts allowed: 8" while the main box said "Attempts left: 7" before I had guessed anything. Once I started playing, the hints contradicted each other, and after I won, the New Game button didn't actually let me play again. Running `pytest` also failed before a single test could run.
+
+- **The hints lie:** with the secret at 46, guessing 100 said "Go LOWER!" but guessing 99 said "Go HIGHER!", even though both guesses were too high.
+- **New Game is broken:** after winning, clicking New Game picked a new secret, but the page still said "You already won" and wouldn't accept guesses.
 
 **Bug Reproduction Log**
 
-Document at least 3 bugs you found. Add rows as needed.
-
 | Input | Expected Behavior | Actual Behavior | Console Output / Error |
 |-------|-------------------|-----------------|------------------------|
-| | | | |
-| | | | |
-| | | | |
+| Ran `pytest` on the starter code | The 3 starter tests run | Test collection failed, no tests ran | `ModuleNotFoundError: No module named 'logic_utils'` |
+| Secret = 46. Guessed 100, then 99 | "Go LOWER!" both times (both are too high) | 100 → "📉 Go LOWER!", 99 → "📈 Go HIGHER!" | None (wrong logic, no error) |
+| Opened a fresh game on Normal | "Attempts left: 8", matching "Attempts allowed: 8" | Showed "Attempts left: 7" before any guess; debug panel showed Attempts = 1 | None |
+| Typed `abc` and clicked Submit | Error message, no attempt used | Showed "That is not a number." but Attempts went from 3 to 4 and "abc" was added to History | None |
+| Won the game (guessed 46), then clicked New Game | A fresh game I can play | New secret (72) and Attempts reset to 0, but the page still said "You already won. Start a new game to play again." and wouldn't take guesses. Score (30) and History were not reset | None |
+| Refreshed, switched difficulty to Easy | Prompt says "between 1 and 20", secret is in 1–20 | Sidebar said "Range: 1 to 20", but the prompt still said "between 1 and 100" and the secret was 36 | None |
 
----
 
 ## 2. How did you use AI as a teammate?
 
