@@ -10,6 +10,10 @@ def test_guess_too_high():
     outcome, message = check_guess(60, 50)
     assert outcome == "Too High"
 
+def test_numeric_comparison_for_multiple_digit_values():
+    outcome, message = check_guess(100, 46)
+    assert outcome == "Too High"
+
 def test_guess_too_low():
     # If secret is 50 and guess is 40, hint should be "Too Low"
     outcome, message = check_guess(40, 50)

@@ -76,7 +76,10 @@ with col3:
 
 if new_game:
     st.session_state.attempts = 0
-    st.session_state.secret = random.randint(1, 100)
+    st.session_state.secret = random.randint(low, high)
+    st.session_state.score = 0
+    st.session_state.history = []
+    st.session_state.status = "playing"
     st.success("New game started.")
     st.rerun()
 
@@ -96,14 +99,9 @@ if submit:
         st.session_state.history.append(raw_guess)
         st.error(err)
     else:
+                # FIX: secret used to become a string on even attempts ("100" < "46"); Copilot changed it to always pass the int, I reviewed the diff
         st.session_state.history.append(guess_int)
-    # FIXME: secret becomes a string on every other attempt, so guesses get compared as text ("100" < "46")
-        if st.session_state.attempts % 2 == 0:
-            secret = str(st.session_state.secret)
-        else:
-            secret = st.session_state.secret
-
-        outcome, message = check_guess(guess_int, secret)
+        outcome, message = check_guess(guess_int, st.session_state.secret)
 
         if show_hint:
             st.warning(message)
